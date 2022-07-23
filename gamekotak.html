@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html class='v2' dir='ltr' lang='en'>
+<title>Game flappybird kw</title>
+<head>
+<style>
+.button {
+  background-color: #4CAF50; /* Hijau */
+  border: 6px solid blue;
+  color: white;
+  padding: 50px 50px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+<SCRIPT type="text/javascript">if (typeof document.onselectstart!="undefined") {document.onselectstart=new Function ("return false");}else{document.onmousedown=new Function ("return false");document.onmouseup=new Function ("return true");}</SCRIPT>
+.button1 {font-size: 10px;}
+.button2 {font-size: 12px;}
+.button3 {font-size: 16px;}
+.button4 {font-size: 20px;}
+.button5 {font-size: 24px;}
+.button6 {font-size: 60px;}
+</style>
+<script type="text/javascript">
+if (typeof document.onselectstart!="undefined") {
+document.onselectstart=new Function ("return false");
+document.onmousedown=new Function ("return false");
+document.onmouseup=new Function ("return true");</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+</head>
+<body bgcolor="black">
+<center><b><font size="6" color="white">FLAPPY BIRD KW</font></b></center><br>
+<center>	
+<div id="myfilter" style="position:absolute;background-color:#000000;opacity:0.3;width:0px;height:0px;display:none"></div><div id="myrestartbutton" style="position:absolute;padding-top:60px;padding-left:75px;display:none;"><button class="button6" onclick="restartGame()"><b>ULANGI</b>
+</button></div><div id="canvascontainer" WIDTH="350" height="180"></div><br/>
+<br />
+<button class="button button5" ontouchstart="moveup()" onmousedown="moveup()" onmouseup="clearmove()"></button><br><br>
+
+  <button class="button button5" ontouchstart="moveleft()" onmousedown="moveleft()" onmouseup="clearmove()"></button>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <button class="button button5" ontouchstart="moveright()" onmousedown="moveright()" onmouseup="clearmove()"></button><br><br>
+
+  <button  class="button button5" ontouchstart="movedown()" onmousedown="movedown()" onmouseup="clearmove()"></button></div>
+
+<br><style>
+canvas {
+    border:6px solid blue;
+    background-color: #f1f1f1;
+}
+</style><br/>
+<script>
+
+var myGameArea;
+var myGamePiece;
+var myObstacles = [];
+var myscore;
+
+function restartGame() {
+document.getElementById("myfilter").style.display = "none";
+document.getElementById("myrestartbutton").style.display = "none";
+myGameArea.stop();
+myGameArea.clear();
+myGameArea = {};
+myGamePiece = {};
+myObstacles = [];
+myscore = {};
+document.getElementById("canvascontainer").innerHTML = "";
+startGame()
+}
+
+function startGame() {
+    myGameArea = new gamearea();
+    myGamePiece = new component(30, 30, "red", 10, 75);
+    myscore = new component("20px", "Consolas", "blue", 220, 25, "text");
+    myGameArea.start();
+}
+
+function gamearea() {
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = 350;
+    this.canvas.height = 180;    
+    document.getElementById("canvascontainer").appendChild(this.canvas);
+    this.context = this.canvas.getContext("2d");
+    this.pause = false;
+    this.frameNo = 1;
+    this.start = function() {
+        this.interval = setInterval(updateGameArea, 10);
+    }
+    this.stop = function() {
+        clearInterval(this.interval);
+        this.pause = true;
+    }
+    this.clear = function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+function component(width, height, color, x, y, type) {
+
+    this.type = type;
+    if (type == "text") {
+        this.text = color;
+    }
+    this.score = 0;    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;    
+    this.update = function() {
+        ctx = myGameArea.context;
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+
+function updateGameArea() {
+    var x, y, min, max, height, gap;
+    for (i = 0; i < myObstacles.length; i += 1) {
+        if (myGamePiece.crashWith(myObstacles[i])) {
+            myGameArea.stop();
+            document.getElementById("myfilter").style.display = "block";
+            document.getElementById("myrestartbutton").style.display = "block";
+            return;
+        } 
+    }
+    if (myGameArea.pause == false) {
+        myGameArea.clear();
+        myGameArea.frameNo += 1;
+        myscore.score +=1;        
+        if (myGameArea.frameNo ==30 || everyinterval(150)) {
+            x = myGameArea.canvas.width;
+            y = myGameArea.canvas.height - 100;
+            min = 20;
+            max = 100;
+            height = Math.floor(Math.random()*(max-min+1)+min);
+            min = 70;
+            max = 70;
+            gap = Math.floor(Math.random()*(max-min+1)+min);
+            myObstacles.push(new component(40, height, "green", x, 0));
+            myObstacles.push(new component(40, x - height - gap, "green", x, height + gap));
+        }
+        for (i = 0; i < myObstacles.length; i += 1) {
+            myObstacles[i].x += -1;
+            myObstacles[i].update();
+        }
+        myscore.text="SKOR: " + myscore.score;        
+        myscore.update();
+        myGamePiece.x += myGamePiece.speedX;
+        myGamePiece.y += myGamePiece.speedY;    
+        myGamePiece.update();
+    }
+}
+
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+
+function moveup(e) {
+    myGamePiece.speedY = -20; 
+}
+
+function movedown() {
+    myGamePiece.speedY = 20; 
+}
+
+function moveleft() {
+    myGamePiece.speedX = -20; 
+}
+
+function moveright() {
+    myGamePiece.speedX = 20; 
+}
+
+function clearmove(e) {
+    myGamePiece.speedX = 0; 
+    myGamePiece.speedY = 0; 
+}
+startGame();
+
+</script>
+<br />
+<br />
+<br />
+<div style='clear: both;'></div>
+</div>
+<div class='post-footer'>
+<div class='post-footer-line post-footer-line-1'>
+<span class='post-author vcard'>
+</span>
+<span class='post-timestamp'>
+</span>
+<span class='post-comment-link'>
+</span>
+</div>
+<div class='post-footer-line post-footer-line-2'>
+</div>
+</div>
+</div>
+</script>
+</center>
+</body>
+</html>
